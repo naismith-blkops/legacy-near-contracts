@@ -1,0 +1,2 @@
+#!/bin/bash
+near delete market.blkops-market.testnet blkops-market.testnet && near create-account market.blkops-market.testnet --masterAccount blkops-market.testnet && ./build.sh && near deploy --wasmFile ../../out/market.wasm --accountId market.blkops-market.testnet && near call market.blkops-market.testnet new '{"owner_id": "market.blkops-market.testnet"}' --accountId market.blkops-market.testnet
