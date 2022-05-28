@@ -12,7 +12,6 @@ pub trait NonFungibleTokenCore {
         &mut self,
         receiver_id: AccountId,
         token_id: TokenId,
-        //we introduce an approval ID so that people with that approval ID can transfer the token
         approval_id: Option<u64>,
         memo: Option<String>,
     );
@@ -60,7 +59,6 @@ trait NonFungibleTokenResolver {
         owner_id: AccountId,
         receiver_id: AccountId,
         token_id: TokenId,
-        //we introduce the approval map so we can keep track of what the approvals were before the transfer
         approved_account_ids: HashMap<AccountId, u64>,
         //we introduce a memo for logging the transfer event
         memo: Option<String>,
@@ -80,7 +78,6 @@ trait NonFungibleTokenResolver {
         owner_id: AccountId,
         receiver_id: AccountId,
         token_id: TokenId,
-        //we introduce the approval map so we can keep track of what the approvals were before the transfer
         approved_account_ids: HashMap<AccountId, u64>,
         //we introduce a memo for logging the transfer event
         memo: Option<String>,
@@ -96,7 +93,6 @@ impl NonFungibleTokenCore for Contract {
         &mut self,
         receiver_id: AccountId,
         token_id: TokenId,
-        //we introduce an approval ID so that people with that approval ID can transfer the token
         approval_id: Option<u64>,
         memo: Option<String>,
     ) {
@@ -127,7 +123,6 @@ impl NonFungibleTokenCore for Contract {
         &mut self,
         receiver_id: AccountId,
         token_id: TokenId,
-        //we introduce an approval ID so that people with that approval ID can transfer the token
         approval_id: Option<u64>,
         memo: Option<String>,
         msg: String,
@@ -206,6 +201,9 @@ impl NonFungibleTokenCore for Contract {
                 metadata,
                 approved_account_ids: token.approved_account_ids,
                 royalty: token.royalty,
+                /*
+                    CUSTOM - fields
+                */
                 token_type: token.token_type
             })
         } else { //if there wasn't a token ID in the tokens_by_id collection, we return None
@@ -226,7 +224,6 @@ impl NonFungibleTokenResolver for Contract {
         owner_id: AccountId,
         receiver_id: AccountId,
         token_id: TokenId,
-        //we introduce the approval map so we can keep track of what the approvals were before the transfer
         approved_account_ids: HashMap<AccountId, u64>,
         //we introduce a memo for logging the transfer event
         memo: Option<String>,

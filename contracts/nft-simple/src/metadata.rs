@@ -1,5 +1,5 @@
 use crate::*;
-pub type TokenId = String;
+
 //defines the payout type we'll be returning as a part of the royalty standards.
 #[derive(Serialize, Deserialize)]
 #[serde(crate = "near_sdk::serde")]
@@ -47,7 +47,9 @@ pub struct Token {
     //keep track of the royalty percentages for the token in a hash map
     pub royalty: HashMap<AccountId, u32>,
 
-    // CUSTOM - fields
+    /*
+        CUSTOM fields
+    */
     pub token_type: Option<String>,
 }
 
@@ -66,7 +68,9 @@ pub struct JsonToken {
     //keep track of the royalty percentages for the token in a hash map
     pub royalty: HashMap<AccountId, u32>,
     
-    // CUSTOM - fields
+    /*
+        CUSTOM fields
+    */
     pub token_type: Option<String>,
 }
 

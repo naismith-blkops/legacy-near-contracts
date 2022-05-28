@@ -8,8 +8,10 @@ impl Contract {
         token_id: Option<TokenId>,
         metadata: TokenMetadata,
         receiver_id: AccountId,
-        //we add an optional parameter for perpetual royalties
         perpetual_royalties: Option<HashMap<AccountId, u32>>,
+        /*
+            CUSTOM parameter
+        */
         token_type: Option<TokenType>,
     ) {
         //measure the initial storage being used on the contract
@@ -20,10 +22,8 @@ impl Contract {
             final_token_id = token_id
         }
 
-        // CUSTOM
         // create a royalty map to store in the token
         let mut royalty = HashMap::new();
-
         let mut total_perpetual = 0;
         // if perpetual royalties were passed into the function: 
         if let Some(perpetual_royalties) = perpetual_royalties {
@@ -37,10 +37,16 @@ impl Contract {
             }
         }
 
-        // royalty limit for minter capped at 20%
+        /*
+            CUSTOM -  royalty limit for minter capped at 20%
+        */
         assert!(total_perpetual <= MINTER_ROYALTY_CAP, "Perpetual royalties cannot be more than 20%");
 
-        // CUSTOM - enforce minting caps by token_type 
+        /*
+            CUSTOM - enforce minting caps by token_type.
+            If a token type was specified, make sure it has a cap and attempt to
+            add the token to the specified type (check for overflow)
+        */ 
         if token_type.is_some() {
             let token_type = token_type.clone().unwrap();
             let cap = u64::from(*self.supply_cap_by_type.get(&token_type).expect("Token type must have supply cap."));
@@ -61,7 +67,6 @@ impl Contract {
             tokens_per_type.insert(&final_token_id);
             self.tokens_per_type.insert(&token_type, &tokens_per_type);
         }
-        // END CUSTOM
 
         //specify the token struct that contains the owner ID 
         let token = Token {
@@ -73,6 +78,9 @@ impl Contract {
             next_approval_id: 0,
             //the map of perpetual royalties for the token (The owner will get 100% - total perpetual royalties)
             royalty,
+            /*
+                CUSTOM - fields
+            */
             token_type
         };
 

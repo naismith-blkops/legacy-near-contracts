@@ -33,7 +33,9 @@ pub const NFT_METADATA_SPEC: &str = "nft-1.0.0";
 /// This is the name of the NFT standard we're using
 pub const NFT_STANDARD_NAME: &str = "nep171";
 
-// CUSTOM types
+/*
+    CUSTOM types
+*/ 
 pub type TokenType = String;
 pub type TypeSupplyCaps = HashMap<TokenType, U64>;
 pub const CONTRACT_ROYALTY_CAP: u32 = 1000;
@@ -101,14 +103,20 @@ impl Contract {
                 Some(&metadata),
             ),
 
+            /*
+                CUSTOM
+            */
             supply_cap_by_type,
             tokens_per_type: LookupMap::new(StorageKey::TokensPerType.try_to_vec().unwrap()),
             token_types_locked: UnorderedSet::new(StorageKey::TokenTypesLocked.try_to_vec().unwrap()),
             contract_royalty: 0,
         };
 
+        /*
+            CUSTOM (tokens aren't locked unless specified)
+        */
         if locked.unwrap_or(false) {
-            // CUSTOM - tokens are locked by default
+            // Lock all tokens per type.
             for token_type in this.supply_cap_by_type.keys() {
                 this.token_types_locked.insert(&token_type);
             }
@@ -118,8 +126,9 @@ impl Contract {
         this
     }
 
-    /// CUSTOM - setters for owner
-
+    /*
+        CUSTOM - setters (owner only)
+    */
     pub fn set_contract_royalty(&mut self, contract_royalty: u32) {
         self.assert_owner();
         assert!(contract_royalty <= CONTRACT_ROYALTY_CAP, "Contract royalties limited to 10% for owner");
@@ -128,6 +137,7 @@ impl Contract {
 
     pub fn add_token_types(&mut self, supply_cap_by_type: TypeSupplyCaps, locked: Option<bool>) {
         self.assert_owner();
+        // Only lock the tokens if specified. 
         for (token_type, hard_cap) in &supply_cap_by_type {
             if locked.unwrap_or(false) {
                 assert!(self.token_types_locked.insert(&token_type), "Token type should not be locked");
@@ -137,13 +147,15 @@ impl Contract {
     }
 
     pub fn unlock_token_types(&mut self, token_types: Vec<String>) {
+        self.assert_owner();
         for token_type in &token_types {
             self.token_types_locked.remove(&token_type);
         }
     }
 
-    /// CUSTOM - views
-
+    /*
+        CUSTOM - getters
+    */
     pub fn get_contract_royalty(&self) -> u32 {
         self.contract_royalty
     }

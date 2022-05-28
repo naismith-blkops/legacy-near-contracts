@@ -87,6 +87,7 @@ pub(crate) fn refund_deposit(storage_used: u64) {
 }
 
 impl Contract {
+    /// Assert that the predecessor is the owner of the contract
     pub(crate) fn assert_owner(&self) {
         assert_eq!(
             &env::predecessor_account_id(),
@@ -95,7 +96,7 @@ impl Contract {
         );
     }
 
-    //add a token to the set of tokens an owner has
+    /// Add a token to the set of tokens an owner has
     pub(crate) fn internal_add_token_to_owner(
         &mut self,
         account_id: &AccountId,
@@ -159,7 +160,9 @@ impl Contract {
         //get the token object by passing in the token_id
         let token = self.tokens_by_id.get(token_id).expect("No token");
 
-        // CUSTOM - token_type can be locked until unlocked by owner
+        /*
+            CUSTOM - token_type can be locked until unlocked by owner
+        */
         if token.token_type.is_some() {
             assert_eq!(self.token_types_locked.contains(&token.token_type.clone().unwrap()), false, "Token transfers are locked");
         }
@@ -208,6 +211,9 @@ impl Contract {
             next_approval_id: token.next_approval_id,
             //we copy over the royalties from the previous token
             royalty: token.royalty.clone(),
+            /*
+                CUSTOM - field
+            */
             token_type: token.token_type.clone()
         };
         //insert that new token into the tokens_by_id, replacing the old entry 

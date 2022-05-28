@@ -74,10 +74,15 @@ impl Contract {
             .collect()
     }
 
+    /*
+        CUSTOM - enumeration methods
+    */
+    /// Batch return a list of token info
     pub fn nft_tokens_batch(
         &self,
         token_ids: Vec<String>,
     ) -> Vec<JsonToken> {
+        // Simple for loop to get the token info
         let mut tmp = vec![];
         for i in 0..token_ids.len() {
             tmp.push(self.nft_token(token_ids[i].clone()).unwrap());
@@ -85,10 +90,12 @@ impl Contract {
         tmp
     }
     
+    /// Get the number of NFTs pertaining to a specific type
     pub fn nft_supply_for_type(
         &self,
         token_type: &String,
     ) -> U64 {
+        // Get a list of token IDs for the given type and return the length
         let tokens_per_type = self.tokens_per_type.get(&token_type);
         if let Some(tokens_per_type) = tokens_per_type {
             U64(tokens_per_type.len())
@@ -97,25 +104,35 @@ impl Contract {
         }
     }
 
+    // Paginate through tokens for a given type
     pub fn nft_tokens_for_type(
         &self,
         token_type: String,
         from_index: U64,
         limit: u64,
     ) -> Vec<JsonToken> {
-        let mut tmp = vec![];
+        //get the set of tokens for the passed in type
         let tokens_per_type = self.tokens_per_type.get(&token_type);
+        //if there is some set of tokens, we'll set the tokens variable equal to that set
         let tokens = if let Some(tokens_per_type) = tokens_per_type {
             tokens_per_type
         } else {
+            //if there is no set of tokens, we'll simply return an empty vector. 
             return vec![];
         };
-        let keys = tokens.as_vector();
-        let start = u64::from(from_index);
-        let end = min(start + limit, keys.len());
-        for i in start..end {
-            tmp.push(self.nft_token(keys.get(i).unwrap()).unwrap());
-        }
-        tmp
+
+        //where to start pagination - if we have a from_index, we'll use that - otherwise start from 0 index
+        let start = u128::from(from_index.unwrap_or(U128(0)));
+
+        //iterate through the keys vector
+        tokens.iter()
+            //skip to the index we specified in the start variable
+            .skip(start as usize) 
+            //take the first "limit" elements in the vector. If we didn't specify a limit, use 50
+            .take(limit.unwrap_or(50) as usize) 
+            //we'll map the token IDs which are strings into Json Tokens
+            .map(|token_id| self.nft_token(token_id.clone()).unwrap())
+            //since we turned the keys into an iterator, we need to turn it back into a vector to return
+            .collect()
     }
 }

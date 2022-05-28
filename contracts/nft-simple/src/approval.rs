@@ -87,7 +87,9 @@ impl NonFungibleTokenCore for Contract {
         //if some message was passed into the function, we initiate a cross contract call on the
         //account we're giving access to. 
         if let Some(msg) = msg {
-            // CUSTOM - add token_type to msg
+            /*
+                CUSTOM - add token_type to msg
+            */
             let mut final_msg = msg;
             let token_type = token.token_type;
             if let Some(token_type) = token_type {
