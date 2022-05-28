@@ -1,5 +1,12 @@
 use crate::*;
 
+#[derive(Serialize, Deserialize)]
+#[serde(crate = "near_sdk::serde")]
+pub struct PurchaseArgs {
+    pub nft_contract_id: AccountId,
+    pub token_id: TokenId,
+}
+
 /// callbacks from FT Contracts
 
 trait FungibleTokenReceiver {
