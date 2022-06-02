@@ -108,8 +108,8 @@ impl Contract {
     pub fn nft_tokens_for_type(
         &self,
         token_type: String,
-        from_index: U64,
-        limit: u64,
+        from_index: Option<U128>,
+        limit: Option<u64>,
     ) -> Vec<JsonToken> {
         //get the set of tokens for the passed in type
         let tokens_per_type = self.tokens_per_type.get(&token_type);
